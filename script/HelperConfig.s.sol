@@ -1,0 +1,68 @@
+//SPDX-License-Identifier:MIT
+
+pragma solidity 0.8.19;
+import {VRFCoordinatorV2_5Mock} from "@chainlink/contracts/src/v0.8/vrf/mocks/VRFCoordinatorV2_5Mock.sol";
+import {Script} from "forge-std/Script.sol";
+
+abstract contract RaffleConstants {
+    uint256 public constant SEPLOIA_CHAIN_ID = 11155111;
+    uint256 public constant LOCAL_CHAIN_ID = 31337;
+    uint96 public constant MOCK_BASEFEE = 10 ether;
+    uint96 public constant MOCK_GASPRICE = 4e10;
+    int256 public constant MOCK_GASWEI_LINK = 4e10;
+}
+
+contract HelperConfig is RaffleConstants, Script {
+    struct NetworkConfig {
+        uint256 enteranceFee;
+        bytes32 keyHash;
+        uint256 subscriptionId;
+        uint32 gasLimit;
+        address vrfCoordinator;
+    }
+
+    NetworkConfig public localNetwork;
+
+    function getConfig() public returns (NetworkConfig memory) {
+        getNetworkfromConfig(block.chainid);
+    }
+
+    function getNetworkfromConfig(
+        uint256 _chainID
+    ) public returns (NetworkConfig memory) {
+        if (_chainID == SEPLOIA_CHAIN_ID) {
+            return getSepoliaConfig();
+        } else if (_chainID == LOCAL_CHAIN_ID) {
+            return getOrCreateAnvilConfig();
+        }
+    }
+
+    function getSepoliaConfig() public pure returns (NetworkConfig memory) {
+        return
+            NetworkConfig({
+                enteranceFee: 0.01 ether,
+                keyHash: 0x787d74caea10b2b357790d5b5247c2f63d1d91572a9846f780606e4d953677ae,
+                subscriptionId: 45000,
+                gasLimit: 7544857,
+                vrfCoordinator: 0x9DdfaCa8183c41ad55329BdeeD9F6A8d53168B1B
+            });
+    }
+
+    function getOrCreateAnvilConfig() public returns (NetworkConfig memory) {
+        vm.startBroadcast();
+        VRFCoordinatorV2_5Mock mock = new VRFCoordinatorV2_5Mock(
+            MOCK_BASEFEE,
+            MOCK_GASPRICE,
+            MOCK_GASWEI_LINK
+        );
+        vm.stopBroadcast();
+        localNetwork = NetworkConfig({
+            enteranceFee: 0.01 ether,
+            keyHash: 0x787d74caea10b2b357790d5b5247c2f63d1d91572a9846f780606e4d953677ae,
+            subscriptionId: 45000,
+            gasLimit: 7544857,
+            vrfCoordinator: address(mock)
+        });
+        return localNetwork;
+    }
+}
