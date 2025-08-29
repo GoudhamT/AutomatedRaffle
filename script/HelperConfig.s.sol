@@ -7,9 +7,9 @@ import {Script} from "forge-std/Script.sol";
 abstract contract RaffleConstants {
     uint256 public constant SEPLOIA_CHAIN_ID = 11155111;
     uint256 public constant LOCAL_CHAIN_ID = 31337;
-    uint96 public constant MOCK_BASEFEE = 10 ether;
-    uint96 public constant MOCK_GASPRICE = 4e10;
-    int256 public constant MOCK_GASWEI_LINK = 4e10;
+    uint96 public constant MOCK_BASEFEE = 0.25 ether;
+    uint96 public constant MOCK_GASPRICE = 1e9;
+    int256 public constant MOCK_GASWEI_LINK = 4e15;
 }
 
 contract HelperConfig is RaffleConstants, Script {
@@ -24,7 +24,7 @@ contract HelperConfig is RaffleConstants, Script {
     NetworkConfig public localNetwork;
 
     function getConfig() public returns (NetworkConfig memory) {
-        getNetworkfromConfig(block.chainid);
+        return getNetworkfromConfig(block.chainid);
     }
 
     function getNetworkfromConfig(
@@ -34,6 +34,8 @@ contract HelperConfig is RaffleConstants, Script {
             return getSepoliaConfig();
         } else if (_chainID == LOCAL_CHAIN_ID) {
             return getOrCreateAnvilConfig();
+        } else {
+            revert("Network not supported");
         }
     }
 
