@@ -97,19 +97,19 @@ contract AutomatedRaffle is VRFConsumerBaseV2Plus {
         }
 
         s_raffleState = RaffleState.CALCULATING;
-        VRFV2PlusClient.RandomWordsRequest memory request = VRFV2PlusClient
-            .RandomWordsRequest({
-                keyHash: i_keyhash,
-                subId: i_subscriptionId,
-                requestConfirmations: REQUEST_CONFIRMATION,
-                callbackGasLimit: i_gasLimit,
-                numWords: NUM_WORDS,
-                extraArgs: VRFV2PlusClient._argsToBytes(
-                    VRFV2PlusClient.ExtraArgsV1({nativePayment: false})
-                )
-            });
+        // VRFV2PlusClient.RandomWordsRequest memory request = VRFV2PlusClient
+        //     .RandomWordsRequest({
+        //         keyHash: i_keyhash,
+        //         subId: i_subscriptionId,
+        //         requestConfirmations: REQUEST_CONFIRMATION,
+        //         callbackGasLimit: i_gasLimit,
+        //         numWords: NUM_WORDS,
+        //         extraArgs: VRFV2PlusClient._argsToBytes(
+        //             VRFV2PlusClient.ExtraArgsV1({nativePayment: false})
+        //         )
+        //     });
 
-        s_vrfCoordinator.requestRandomWords(request);
+        // s_vrfCoordinator.requestRandomWords(request);
     }
 
     function fulfillRandomWords(

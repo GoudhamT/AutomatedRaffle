@@ -2,7 +2,7 @@
 
 pragma solidity 0.8.19;
 
-import {Script} from "forge-std/Script.sol";
+import {Script, console} from "forge-std/Script.sol";
 import {AutomatedRaffle} from "src/AutomatedRaffle.sol";
 import {DeployRaffle} from "script/DeployRaffle.s.sol";
 import {HelperConfig} from "script/HelperConfig.s.sol";
@@ -73,13 +73,48 @@ contract RaffleTest is Script {
         assert(upKeepNeeded == false);
     }
 
-    function testUpKeepNeededEveryConditionPassed() public {
+    modifier RaffleEntered() {
         vm.prank(PLAYER);
         automatedRaffle.enterRaffle{value: enteranceFee}();
-        uint256 timeNow = automatedRaffle.getTime();
         vm.warp(block.timestamp + automatedRaffle.INTERVAL() + 1);
         vm.roll(1);
+        _;
+    }
+
+    function testUpKeepNeededEveryConditionPassed() public RaffleEntered {
         (bool upKeepNeeded, ) = automatedRaffle.checkUpkeep("");
         assert(upKeepNeeded);
+    }
+
+    function testPerformUpKeepTimeNotPassed() external {
+        vm.prank(PLAYER);
+        // console.log("Rafffle time", automatedRaffle.getTime());
+        // console.log("current time ", block.timestamp);
+
+        vm.expectRevert(
+            abi.encodeWithSelector(
+                AutomatedRaffle.Raffle__TimehasNotPassed.selector,
+                0
+            )
+        );
+        automatedRaffle.performUpkeep("");
+    }
+
+    function testCheckRaffleStatusIsCalculating() external RaffleEntered {
+        automatedRaffle.performUpkeep("");
+        assert(
+            automatedRaffle.getState() ==
+                AutomatedRaffle.RaffleState.CALCULATING
+        );
+    }
+
+    function testEnterRafleAgainExpectStateNotOpenError()
+        external
+        RaffleEntered
+    {
+        automatedRaffle.performUpkeep("");
+        vm.prank(PLAYER);
+        vm.expectRevert(AutomatedRaffle.Raffle__StateisnotOpen.selector);
+        automatedRaffle.enterRaffle{value: enteranceFee}();
     }
 }
