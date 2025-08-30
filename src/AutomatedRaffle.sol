@@ -12,7 +12,7 @@ contract AutomatedRaffle is VRFConsumerBaseV2Plus {
         CALCULATING
     }
     /* State Variabels */
-    uint256 private constant INTERVAL = 1 hours;
+    uint256 public constant INTERVAL = 1 hours;
     uint16 private constant REQUEST_CONFIRMATION = 3;
     uint32 private constant NUM_WORDS = 1;
     uint256 private immutable i_enteranceFee;
@@ -57,7 +57,7 @@ contract AutomatedRaffle is VRFConsumerBaseV2Plus {
 
     /*Modifiers */
     modifier verifyEnteranceFee() {
-        require(msg.value > i_enteranceFee, "Raffle Entry denied");
+        require(msg.value >= i_enteranceFee, "Raffle Entry denied");
         _;
     }
 
