@@ -44,7 +44,7 @@ contract HelperConfig is RaffleConstants, Script {
             NetworkConfig({
                 enteranceFee: 0.01 ether,
                 keyHash: 0x787d74caea10b2b357790d5b5247c2f63d1d91572a9846f780606e4d953677ae,
-                subscriptionId: 45000,
+                subscriptionId: 0,
                 gasLimit: 7544857,
                 vrfCoordinator: 0x9DdfaCa8183c41ad55329BdeeD9F6A8d53168B1B
             });
@@ -61,7 +61,7 @@ contract HelperConfig is RaffleConstants, Script {
         localNetwork = NetworkConfig({
             enteranceFee: 0.01 ether,
             keyHash: 0x787d74caea10b2b357790d5b5247c2f63d1d91572a9846f780606e4d953677ae,
-            subscriptionId: 45000,
+            subscriptionId: 0,
             gasLimit: 7544857,
             vrfCoordinator: address(mock)
         });
