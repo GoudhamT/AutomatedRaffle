@@ -4,7 +4,7 @@ pragma solidity 0.8.19;
 import {Script, console} from "forge-std/Script.sol";
 import {AutomatedRaffle} from "src/AutomatedRaffle.sol";
 import {HelperConfig} from "script/HelperConfig.s.sol";
-import {CreateSubscriptioninInteractions} from "script/Interactions.s.sol";
+import {CreateSubscriptioninInteractions, FundSubscriptionInteractions, AddConsumer} from "script/Interactions.s.sol";
 
 contract DeployRaffle is Script {
     // AutomatedRaffle automatedRaffle;
@@ -21,6 +21,12 @@ contract DeployRaffle is Script {
             (config.vrfCoordinator, config.subscriptionId) = createSubID
                 .createSubscriptionID(config.vrfCoordinator);
             console.log("This is your ID", config.subscriptionId);
+            FundSubscriptionInteractions fundingToSubscription = new FundSubscriptionInteractions();
+            fundingToSubscription.fundSubscription(
+                config.vrfCoordinator,
+                config.subscriptionId,
+                config.link
+            );
         }
         vm.startBroadcast();
         AutomatedRaffle automatedRaffle = new AutomatedRaffle(
@@ -31,7 +37,14 @@ contract DeployRaffle is Script {
             config.vrfCoordinator
         );
         vm.stopBroadcast();
+        AddConsumer addingConsumerToContract = new AddConsumer();
+        addingConsumerToContract.addConsumer(
+            config.vrfCoordinator,
+            address(automatedRaffle),
+            config.subscriptionId
+        );
         console.log("my ID is ", config.subscriptionId);
+        console.log("Adding consumer to contract", address(automatedRaffle));
         return (automatedRaffle, helperConfig);
     }
 }
