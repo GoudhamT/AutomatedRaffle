@@ -35,7 +35,10 @@ contract HelperConfig is RaffleConstants, Script {
         if (_chainID == SEPLOIA_CHAIN_ID) {
             return getSepoliaConfig();
         } else if (_chainID == LOCAL_CHAIN_ID) {
-            return getOrCreateAnvilConfig();
+            if (localNetwork.vrfCoordinator == address(0)) {
+                return getOrCreateAnvilConfig();
+            }
+            return localNetwork;
         } else {
             revert("Network not supported");
         }
@@ -71,5 +74,10 @@ contract HelperConfig is RaffleConstants, Script {
             link: address(linkToken)
         });
         return localNetwork;
+    }
+
+    // ✅ Add setter to update subscriptionId after creation
+    function setSubscriptionId(uint256 _subId) public {
+        localNetwork.subscriptionId = _subId;
     }
 }

@@ -10,7 +10,9 @@ contract DeployRaffle is Script {
     // AutomatedRaffle automatedRaffle;
     // HelperConfig helperConfig;
 
-    function run() public {}
+    function run() public {
+        deployContract();
+    }
 
     function deployContract() public returns (AutomatedRaffle, HelperConfig) {
         HelperConfig helperConfig = new HelperConfig();
@@ -27,6 +29,8 @@ contract DeployRaffle is Script {
                 config.subscriptionId,
                 config.link
             );
+            // ✅ persist in helperConfig
+            helperConfig.setSubscriptionId(config.subscriptionId);
         }
         vm.startBroadcast();
         AutomatedRaffle automatedRaffle = new AutomatedRaffle(

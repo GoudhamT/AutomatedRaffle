@@ -6,8 +6,9 @@ import {Script, console} from "forge-std/Script.sol";
 import {AutomatedRaffle} from "src/AutomatedRaffle.sol";
 import {DeployRaffle} from "script/DeployRaffle.s.sol";
 import {HelperConfig} from "script/HelperConfig.s.sol";
+import {Test} from "forge-std/Test.sol";
 
-contract RaffleTest is Script {
+contract RaffleTest is Script, Test {
     AutomatedRaffle automatedRaffle;
     HelperConfig helperConfig;
     uint256 enteranceFee;
@@ -116,5 +117,30 @@ contract RaffleTest is Script {
         vm.prank(PLAYER);
         vm.expectRevert(AutomatedRaffle.Raffle__StateisnotOpen.selector);
         automatedRaffle.enterRaffle{value: enteranceFee}();
+    }
+
+    /*Constructor tests */
+    function testValidateEnteranceFee() external RaffleEntered {
+        assert(automatedRaffle.getEnteranceFee() > 0);
+    }
+
+    function testValidateKeyHash() external {
+        vm.prank(PLAYER);
+        automatedRaffle.enterRaffle{value: enteranceFee}();
+        assertEq(automatedRaffle.getHash(), keyHash);
+    }
+
+    function testValidateSubscriptionId() external {
+        vm.prank(PLAYER);
+        automatedRaffle.enterRaffle{value: enteranceFee}();
+        console.log("raffle subscription is", subscriptionId);
+        // assert(subscriptionId != 0);
+        assertEq(automatedRaffle.getSubscriptionId(), subscriptionId);
+    }
+
+    function testValidateGasLimit() external {
+        vm.prank(PLAYER);
+        automatedRaffle.enterRaffle{value: enteranceFee}();
+        assertEq(automatedRaffle.getGasLimit(), gasLimit);
     }
 }
